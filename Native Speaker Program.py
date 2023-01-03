@@ -1,7 +1,7 @@
 from consolemenu import *
 from consolemenu.items import *
 
-import consts
+import consts, managerCredentials
 from objects import Manager, Student, Volunteer, DbHandler, Matcher, check_internet_connection
 
 
@@ -9,11 +9,11 @@ def press_any_key():
     input("\nPress any key to continue...")
 
 def add_student():
-    print("Enter Student's detailes. Press e + enter to exit\n")
+    print("Enter Student's details. Press e + enter to exit\n")
     DbHandler().add_object_to_db(Student.interactive())
 
 def add_volunteer():
-    print("Enter Student's detailes. Press e + enter to exit\n")
+    print("Enter Volunteer's details. Press e + enter to exit\n")
     DbHandler().add_object_to_db(Volunteer.interactive())
 
 def show_students():
@@ -39,8 +39,8 @@ def auto_match():
         return
     manager = Manager(consts.DEFAULT_MANAGER_FIRST_NAME,
                       consts.DEFAULT_MANAGER_LAST_NAME,
-                      consts.DEFAULT_MANAGER_EMAIL,
-                      consts.DEFAULT_MANAGER_PASSWORD)
+                      managerCredentials.DEFAULT_MANAGER_EMAIL,
+                      managerCredentials.DEFAULT_MANAGER_PASSWORD)
     matches = Matcher(manager).match_and_show()
     approval = input("\nDo you agree? [y/N]: ")
     if approval in ("y", "Y"):
