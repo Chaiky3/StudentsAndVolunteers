@@ -37,8 +37,8 @@ def auto_match():
         print("This action requires internet connection, please connect to the internet and try again")
         press_any_key()
         return
-    manager = Manager(consts.DEFAULT_MANAGER_FIRST_NAME,
-                      consts.DEFAULT_MANAGER_LAST_NAME,
+    manager = Manager(managerCredentials.DEFAULT_MANAGER_FIRST_NAME,
+                      managerCredentials.DEFAULT_MANAGER_LAST_NAME,
                       managerCredentials.DEFAULT_MANAGER_EMAIL,
                       managerCredentials.DEFAULT_MANAGER_PASSWORD)
     matches = Matcher(manager).match_and_show()
@@ -108,8 +108,8 @@ def run_menu():
     menu = ConsoleMenu("Students & Volunteers Matcher", "Choose an option:")
 
     # items
-    menu.append_item(FunctionItem("Add a student", add_student))
-    menu.append_item(FunctionItem("Add a volunteer", add_volunteer))
+    menu.append_item(FunctionItem("Add a Student", add_student))
+    menu.append_item(FunctionItem("Add a Volunteer", add_volunteer))
     menu.append_item(FunctionItem("Auto Match", auto_match))
     menu.append_item(FunctionItem("Manual Match", manual_match))
     menu.append_item(FunctionItem("Show students", show_students))

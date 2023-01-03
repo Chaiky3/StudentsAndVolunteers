@@ -15,7 +15,8 @@ Please read the following guidelines carefully:
 
 https://docs.google.com/document/d/1SdHe98UghKRDFJTS_vrCMOGPdTabw5Yasc9fUcg3giU/edit?usp=sharing
 
-After reading this, please contact {1} {2}:
+After reading this, please contact:
+{1} {2}
 {3}
 {4}
 
@@ -27,7 +28,7 @@ Dear {0}!
 
 Thank you for agreeing to speak on a regular basis with my students in order to help them improve their oral proficiency.
 
-I have given your contact information to a {1} {2} who will hopefully contact you soon.
+I have given your contact information to {1} {2} who will hopefully contact you soon.
 
 If you do not hear from him/her, please let me know and I will hook you up with someone else.
 
