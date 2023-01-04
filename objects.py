@@ -292,12 +292,13 @@ class Matcher():
     def __init__(self, manager: Manager) -> None:
         self.manager = manager
         self.dbHandler: DbHandler = DbHandler()
+        self.new_matches: List[Match] = []
         self.matches: List[Match] = self.dbHandler.db_content["matches"]
 
     def match_and_show(self) -> List[Match]:
         students = self.dbHandler.db_content["students"]
         volunteers = self.dbHandler.db_content["volunteers"]
-        
+
         print("New Matches:\n")
         # search volunteer for each student
         for student in students:
@@ -310,6 +311,7 @@ class Matcher():
                     continue
                 new_match = Match(self.manager, student, volunteer)
                 self.matches.append(new_match)
+                self.new_matches.append(new_match)
                 print(new_match)
                 break
 
@@ -322,4 +324,4 @@ class Matcher():
         else:
             print(f"\n\nAll students and volunteers coupled\n")
 
-        return self.matches
+        return self.new_matches
