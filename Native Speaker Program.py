@@ -1,12 +1,12 @@
 from consolemenu import *
 from consolemenu.items import *
 
-import consts, managerCredentials
+import managerCredentials
 from objects import Manager, Student, Volunteer, DbHandler, Matcher, check_internet_connection
 
 
 def press_any_key():
-    input("\nPress any key to continue...")
+    input("\nPress Enter to continue...")
 
 def add_student():
     print("Enter Student's details. Press e + enter to exit\n")
@@ -41,12 +41,12 @@ def auto_match():
                       managerCredentials.DEFAULT_MANAGER_LAST_NAME,
                       managerCredentials.DEFAULT_MANAGER_EMAIL,
                       managerCredentials.DEFAULT_MANAGER_PASSWORD)
-    matches = Matcher(manager).match_and_show()
+    new_matches = Matcher(manager).match_and_show()
     approval = input("\nDo you agree? [y/N]: ")
     if approval in ("y", "Y"):
-        DbHandler().add_objects_to_db(matches)
+        DbHandler().add_objects_to_db(new_matches)
         print("Sending introduction emails to new participants, this might take a while...")
-        for match in matches:
+        for match in new_matches:
             match.send_introduction_message()
 
 
