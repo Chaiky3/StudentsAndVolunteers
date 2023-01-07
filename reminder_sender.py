@@ -23,7 +23,7 @@ def send_reminders():
     wait_for_internet_connection()
     time_now = datetime.now()
     if time_now.weekday() in (4, 5):
-        print(f"{datetime.now()}: Friday, not sending notifications")
+        report_to_logger(f"{datetime.now()}: Friday, not sending notifications")
         return
     dbHandler = DbHandler()
     matches = dbHandler.db_content["matches"]
