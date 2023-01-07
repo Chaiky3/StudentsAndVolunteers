@@ -20,16 +20,20 @@ def show_students():
     students = DbHandler().db_content["students"]
     for student in students:
         print(student)
-    if len(students) == 0:
+    if not len(students):
         print("No existing students")
+    else:
+        print(f"{len(students)} students")
     press_any_key()
 
 def show_volunteers():
     volunteers = DbHandler().db_content["volunteers"]
     for volunteer in volunteers:
         print(volunteer)
-    if len(volunteers) == 0:
+    if not len(volunteers):
         print("No existing volunteers")
+    else:
+        print(f"{len(volunteers)} volunteers")
     press_any_key()
 
 def auto_match():
@@ -58,8 +62,10 @@ def show_matches():
     matches = DbHandler().db_content["matches"]
     for match in matches:
         print(match)
-    if len(matches) == 0:
+    if not len(matches):
         print("No existing matches")
+    else:
+        print(f"\n{len(matches)} matches")
     input("\nEnter any key to continue...")
 
 # def delete_student():
