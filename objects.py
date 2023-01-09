@@ -6,6 +6,8 @@ import smtplib
 import urllib.request
 import urllib.error
 
+import managerCredentials
+
 from time import sleep
 from datetime import datetime
 from contextlib import suppress
@@ -72,6 +74,18 @@ class Volunteer(Human):
         return super().__repr__() + f"""phone: {self.phone}
         """
 
+    def send_thanks_email(self) -> None:
+        thanks_message = consts.THANKS_MESSAGE.format(self.first_name,
+                                                      self.manager.first_name,
+                                                      self.manager.last_name)
+        thanks_email = Email(
+            subject=consts.THANKS_EMAIL_SUBJECT,
+            message=thanks_message,
+            dst_address=self.email
+        )
+
+        MailBox().send_emails([thanks_email])
+
     @staticmethod
     def interactive() -> Volunteer:
         params = []
@@ -102,18 +116,18 @@ class Match(Writeable):
     def send_introduction_message(self) -> None:
         subject = "Introduction to native speakers program"
 
-        message_for_student = consts.VOLUNTEER_INTRODUCTION_STR.format(self.student.first_name,
-                                                                                 self.volunteer.first_name,
-                                                                                 self.volunteer.last_name,
-                                                                                 self.volunteer.phone,
-                                                                                 self.volunteer.email,
-                                                                                 self.manager.first_name,
-                                                                                 self.manager.last_name)
+        message_for_student = consts.STUDENT_INTRODUCTION_STR.format(self.student.first_name,
+                                                                     self.volunteer.first_name,
+                                                                     self.volunteer.last_name,
+                                                                     self.volunteer.phone,
+                                                                     self.volunteer.email,
+                                                                     self.manager.first_name,
+                                                                     self.manager.last_name)
         message_for_volunteer = consts.VOLUNTEER_INTRODUCTION_STR.format(self.volunteer.first_name,
-                                                                                     self.student.first_name,
-                                                                                     self.student.last_name,
-                                                                                     self.manager.first_name,
-                                                                                     self.manager.last_name)
+                                                                         self.student.first_name,
+                                                                         self.student.last_name,
+                                                                         self.manager.first_name,
+                                                                         self.manager.last_name)
         email_to_student = Email(
             subject=subject,
             message=message_for_student,
@@ -125,7 +139,7 @@ class Match(Writeable):
             dst_address=self.volunteer.email
         )
 
-        MailBox(self.manager).send_emails([email_to_student, email_to_volunteer])
+        MailBox().send_emails([email_to_student, email_to_volunteer])
 
     def send_reminder(self, time_passed) -> Match:
         """returns match with value of first/second remider sent updated"""
@@ -159,7 +173,7 @@ class Match(Writeable):
             dst_address=self.volunteer.email
         )
 
-        MailBox(self.manager).send_emails([email_to_student, email_to_volunteer])
+        MailBox().send_emails([email_to_student, email_to_volunteer])
 
         return self
 
@@ -167,15 +181,15 @@ class Match(Writeable):
         subject = "Native Speakers Program Dematch"
 
         message_for_student = consts.CANCELATION_STR.format(self.student.first_name, 
-                                                         self.volunteer.first_name, 
-                                                         self.volunteer.first_name, 
-                                                         self.manager.first_name,
-                                                         self.manager.last_name)
+                                                            self.volunteer.first_name, 
+                                                            self.volunteer.first_name, 
+                                                            self.manager.first_name,
+                                                            self.manager.last_name)
         message_for_volunteer = consts.CANCELATION_STR.format(self.volunteer.first_name, 
-                                                           self.student.first_name, 
-                                                           self.student.last_name, 
-                                                           self.manager.first_name,
-                                                           self.manager.last_name)
+                                                              self.student.first_name, 
+                                                              self.student.last_name, 
+                                                              self.manager.first_name,
+                                                              self.manager.last_name)
 
         email_to_student = Email(
             subject=subject,
@@ -189,7 +203,7 @@ class Match(Writeable):
             dst_address=self.volunteer.email,
         )
 
-        MailBox(self.manager).send_emails([email_to_student, email_to_volunteer])
+        MailBox().send_emails([email_to_student, email_to_volunteer])
 
 
 class DbHandler():
@@ -314,10 +328,15 @@ class Email():
 
 @dataclass
 class MailBox():
-    manager: Manager
     port: int = 465
     smtp_email: str = "smtp.gmail.com"
     context: ssl.SSLContext = ssl.create_default_context()
+
+    def __post_init__(self):
+        self.manager = Manager(managerCredentials.DEFAULT_MANAGER_FIRST_NAME,
+                               managerCredentials.DEFAULT_MANAGER_LAST_NAME,
+                               managerCredentials.DEFAULT_MANAGER_EMAIL,
+                               managerCredentials.DEFAULT_MANAGER_PASSWORD)
 
     def send_emails(self, emails: List[Email]) -> None:
         with smtplib.SMTP_SSL(self.smtp_email, self.port, context=self.context) as server:

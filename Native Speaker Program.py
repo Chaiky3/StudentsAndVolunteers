@@ -10,11 +10,19 @@ def press_any_key():
 
 def add_student():
     print("Enter Student's details. Press e + enter to exit\n")
-    DbHandler().add_object_to_db(Student.interactive())
+    new_student = Student.interactive()
+    if new_student is not None:
+        DbHandler().add_object_to_db(new_student)
 
 def add_volunteer():
     print("Enter Volunteer's details. Press e + enter to exit\n")
-    DbHandler().add_object_to_db(Volunteer.interactive())
+    new_volunteer = Volunteer.interactive()
+    if new_volunteer is not None:
+        DbHandler().add_object_to_db(new_volunteer)
+        send_thanks_email = input(f"Do you want to thank {new_volunteer.first_name} for joining? [n/Y]: ")
+        if send_thanks_email not in ("n", "N"):
+            print(f"Sending thanks email to {new_volunteer.first_name}...")
+            new_volunteer.send_thanks_email()
 
 def show_students():
     students = DbHandler().db_content["students"]

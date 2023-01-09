@@ -6,7 +6,18 @@ DAY_IN_SECS = 86400
 
 MESSAGE_SUBJECT = "Subject: {}\n\n"
 
-VOLUNTEER_INTRODUCTION_STR = """
+THANKS_EMAIL_SUBJECT = "THANKS!"
+
+THANKS_MESSAGE = """
+Hi {0}, thank you for offering to help out with the students.
+
+As soon as I have a student to pair up with you I'll contact you. 
+
+All the best, 
+{1} {2}
+"""
+
+STUDENT_INTRODUCTION_STR = """
 Dear {0},
 
 I am glad you signed up for the native speakers program.
