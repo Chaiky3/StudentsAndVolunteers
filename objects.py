@@ -100,29 +100,41 @@ class Match(Writeable):
         return f"{self.student.first_name} {self.student.last_name} <--> {self.volunteer.first_name} {self.volunteer.last_name}"
 
     def send_introduction_message(self) -> None:
-        subject = consts.MESSAGE_SUBJECT.format("Introduction to native speakers program")
+        subject = "Introduction to native speakers program"
 
-        message_for_student = consts.STUDENT_INTRODUCTION_MESSAGE_MESSAGE.format(self.student.first_name,
+        message_for_student = consts.VOLUNTEER_INTRODUCTION_STR.format(self.student.first_name,
                                                                                  self.volunteer.first_name,
                                                                                  self.volunteer.last_name,
                                                                                  self.volunteer.phone,
                                                                                  self.volunteer.email,
                                                                                  self.manager.first_name,
                                                                                  self.manager.last_name)
-        message_for_volunteer = consts.VOLUNTEER_INTRODUCTION_MESSAGE_MESSAGE.format(self.volunteer.first_name,
+        message_for_volunteer = consts.VOLUNTEER_INTRODUCTION_STR.format(self.volunteer.first_name,
                                                                                      self.student.first_name,
                                                                                      self.student.last_name,
                                                                                      self.manager.first_name,
                                                                                      self.manager.last_name)
-        MailBox(self.manager).send_emails(self, subject, message_for_student, message_for_volunteer)
+        email_to_student = Email(
+            subject=subject,
+            message=message_for_student,
+            dst_address=self.student.email)
+
+        email_to_volunteer = Email(
+            subject=subject,
+            message=message_for_volunteer,
+            dst_address=self.volunteer.email
+        )
+
+        MailBox(self.manager).send_emails([email_to_student, email_to_volunteer])
 
     def send_reminder(self, time_passed) -> Match:
+        """returns match with value of first/second remider sent updated"""
         if not self.first_reminder_sent:
             self.first_reminder_sent = True
         else:
             self.second_reminder_sent = True
 
-        subject = consts.MESSAGE_SUBJECT.format("Reminder about native speakers program")
+        subject = "Reminder about native speakers program"
         
         message_for_student = consts.REMINDER_STR.format(self.student.first_name, 
                                                          self.volunteer.first_name, 
@@ -134,12 +146,25 @@ class Match(Writeable):
                                                            time_passed, 
                                                            self.manager.first_name,
                                                            self.manager.last_name)
-        MailBox(self.manager).send_emails(self, subject, message_for_student, message_for_volunteer)
+        
+        email_to_student = Email(
+            subject=subject,
+            message=message_for_student,
+            dst_address=self.student.email
+        )
+
+        email_to_volunteer = Email(
+            subject=subject,
+            message=message_for_volunteer,
+            dst_address=self.volunteer.email
+        )
+
+        MailBox(self.manager).send_emails([email_to_student, email_to_volunteer])
 
         return self
 
     def send_cancelation_messages(self):
-        subject = consts.MESSAGE_SUBJECT.format("Native Speakers Program Dematch")
+        subject = "Native Speakers Program Dematch"
 
         message_for_student = consts.CANCELATION_STR.format(self.student.first_name, 
                                                          self.volunteer.first_name, 
@@ -152,7 +177,19 @@ class Match(Writeable):
                                                            self.manager.first_name,
                                                            self.manager.last_name)
 
-        MailBox(self.manager).send_emails(self, subject, message_for_student, message_for_volunteer)
+        email_to_student = Email(
+            subject=subject,
+            message=message_for_student,
+            dst_address=self.student.email,
+        )
+
+        email_to_volunteer = Email(
+            subject=subject,
+            message=message_for_volunteer,
+            dst_address=self.volunteer.email,
+        )
+
+        MailBox(self.manager).send_emails([email_to_student, email_to_volunteer])
 
 
 class DbHandler():
@@ -266,27 +303,31 @@ class DbHandler():
         self.write_db_content_to_db()
 
 @dataclass
+class Email():
+    subject: str
+    message: str
+    dst_address: str
+
+    def __post_init__(self):
+        self.subject = consts.MESSAGE_SUBJECT.format(self.subject)
+
+
+@dataclass
 class MailBox():
     manager: Manager
     port: int = 465
     smtp_email: str = "smtp.gmail.com"
     context: ssl.SSLContext = ssl.create_default_context()
 
-    def send_emails(self, match: Match, subject, message_for_student: str, message_for_volunteer: str) -> None:
+    def send_emails(self, emails: List[Email]) -> None:
         with smtplib.SMTP_SSL(self.smtp_email, self.port, context=self.context) as server:
             server.login(self.manager.email, self.manager.password)
-            # send email to student
-            server.sendmail(
-                        self.manager.email,
-                        match.student.email,
-                        subject + message_for_student
-                    )
-            # send email to volunteer
-            server.sendmail(
-                        self.manager.email,
-                        match.volunteer.email,
-                        subject + message_for_volunteer
-                    )
+            for email in emails:
+                server.sendmail(
+                    self.manager.email,
+                    email.dst_address,
+                    email.subject + email.message
+                )
 
 class Matcher():
     def __init__(self, manager: Manager) -> None:
