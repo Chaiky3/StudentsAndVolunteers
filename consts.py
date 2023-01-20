@@ -30,7 +30,7 @@ Thank you for agreeing to speak on a regular basis with my students in order to 
 
 I have given your contact information to {1} {2} who will hopefully contact you soon.
 
-If you do not hear from him/her, please let me know and I will hook you up with someone else.
+If you do not hear from {1}, please let me know and I will hook you up with someone else.
 
 Your willingness to invest time in these students means a lot. These students will eventually become English teachers and will teach the next generation of Israelis, so your help will impact the national level of oral proficiency in Israel!
 
