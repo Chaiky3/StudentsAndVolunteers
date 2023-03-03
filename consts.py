@@ -6,7 +6,7 @@ DAY_IN_SECS = 86400
 
 MESSAGE_SUBJECT = "Subject: {}\n\n"
 
-STUDENT_INTRODUCTION_MESSAGE_MESSAGE = """
+STUDENT_INTRODUCTION_STR = """
 Dear {0},
 
 I am glad you signed up for the native speakers program.
@@ -23,7 +23,7 @@ After reading this, please contact:
 {5} {6}
 """
 
-VOLUNTEER_INTRODUCTION_MESSAGE_MESSAGE = """
+VOLUNTEER_INTRODUCTION_STR = """
 Dear {0}!
 
 Thank you for agreeing to speak on a regular basis with my students in order to help them improve their oral proficiency.
