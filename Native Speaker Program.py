@@ -57,7 +57,7 @@ def auto_match():
     manager = Manager(managerCredentials.DEFAULT_MANAGER_FIRST_NAME,
                       managerCredentials.DEFAULT_MANAGER_LAST_NAME,
                       managerCredentials.DEFAULT_MANAGER_EMAIL,
-                      managerCredentials.DEFAULT_MANAGER_PASSWORD)
+                      managerCredentials.DEFAULT_MANAGER_API_KEY)
     new_matches = Matcher(manager).match_and_show()
     if not new_matches:
         press_any_key()
