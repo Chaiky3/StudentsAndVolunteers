@@ -7,11 +7,14 @@ import smtplib
 import pathlib
 
 from datetime import datetime
-from typing import List, Dict, Tuple, Any, Optional, Union
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
+from typing import List, Dict, Tuple, Any, Optional, Union
 
 import consts
+import managerCredentials
 
 from utils import is_there_match_in_list_of_matches
 
@@ -71,12 +74,11 @@ class Volunteer(Human):
 
 @dataclass(unsafe_hash=True)
 class Manager(Human):
-    password: str
+    apikey: str
 
 
 @dataclass(unsafe_hash=True)
 class Match(Writeable):
-    manager: Manager
     student_id: int
     volunteer_id: int
     date: Tuple[int, int] = datetime.now().year, datetime.now().month, datetime.now().day
@@ -89,6 +91,10 @@ class Match(Writeable):
         return f"{student.first_name} {student.last_name} <--> {volunteer.first_name} {volunteer.last_name}"
 
     def send_introduction_message(self) -> None:
+        manager = Manager(managerCredentials.DEFAULT_MANAGER_FIRST_NAME,
+                          managerCredentials.DEFAULT_MANAGER_LAST_NAME,
+                          managerCredentials.DEFAULT_MANAGER_EMAIL,
+                          managerCredentials.DEFAULT_MANAGER_API_KEY)
         student = DbHandler().get_student_by_id(self.student_id)
         volunteer = DbHandler().get_volunteer_by_id(self.volunteer_id)
 
@@ -99,13 +105,13 @@ class Match(Writeable):
                                                                      volunteer.last_name,
                                                                      volunteer.phone,
                                                                      volunteer.email,
-                                                                     self.manager.first_name,
-                                                                     self.manager.last_name)
+                                                                     manager.first_name,
+                                                                     manager.last_name)
         message_for_volunteer = consts.VOLUNTEER_INTRODUCTION_STR.format(volunteer.first_name,
                                                                          student.first_name,
                                                                          student.last_name,
-                                                                         self.manager.first_name,
-                                                                         self.manager.last_name)
+                                                                         manager.first_name,
+                                                                         manager.last_name)
         email_to_student = Email(
             subject=subject,
             message=message_for_student,
@@ -117,7 +123,7 @@ class Match(Writeable):
             dst_address=volunteer.email
         )
 
-        MailBox(self.manager).send_emails([email_to_student, email_to_volunteer])
+        MailBox(manager).send_emails([email_to_student, email_to_volunteer])
 
     def send_reminder(self, time_passed) -> None:
         subject = "Reminder about native speakers program"
@@ -312,19 +318,19 @@ class Email():
 @dataclass
 class MailBox():
     manager: Manager
-    port: int = 465
-    smtp_email: str = "smtp.gmail.com"
-    context: ssl.SSLContext = ssl.create_default_context()
+    
+    def __post_init__(self):
+        self.sg = SendGridAPIClient(self.manager.apikey)
 
     def send_emails(self, emails: List[Email]) -> None:
-        with smtplib.SMTP_SSL(self.smtp_email, self.port, context=self.context) as server:
-            server.login(self.manager.email, self.manager.password)
-            for email in emails:
-                server.sendmail(
-                    self.manager.email,
-                    email.dst_address,
-                    email.subject + email.message
-                )
+        for email in emails:
+            self.sg.send(Mail(
+                from_email=self.manager.email,
+                to_emails=email.dst_address,
+                subject=email.subject,
+                html_content=email.message
+            ))
+
 
 class Matcher():
     def __init__(self, manager: Manager) -> None:
@@ -346,7 +352,7 @@ class Matcher():
                 if is_there_match_in_list_of_matches(volunteer_id=volunteer_id, matches=self.matches):
                     # volunteer is taken
                     continue
-                new_match = Match(self.manager, student_id, volunteer_id)
+                new_match = Match(student_id, volunteer_id)
                 self.matches.append(new_match)
                 new_matches.append(new_match)
                 print(new_match)
