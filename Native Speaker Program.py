@@ -54,10 +54,11 @@ def auto_match():
         print("This action requires internet connection, please connect to the internet and try again")
         press_any_key()
         return
-    manager = Manager(managerCredentials.DEFAULT_MANAGER_FIRST_NAME,
-                      managerCredentials.DEFAULT_MANAGER_LAST_NAME,
-                      managerCredentials.DEFAULT_MANAGER_EMAIL,
-                      managerCredentials.DEFAULT_MANAGER_API_KEY)
+    manager = Manager(managerCredentials.MANAGER_FIRST_NAME,
+                      managerCredentials.MANAGER_LAST_NAME,
+                      managerCredentials.MANAGER_EMAIL,
+                      managerCredentials.MANAGER_API_KEY,
+                      managerCredentials.MANAGER_API_SECRET)
     new_matches = Matcher(manager).match_and_show()
     if not new_matches:
         press_any_key()

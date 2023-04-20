@@ -13,7 +13,7 @@ STUDENT_INTRODUCTION_STR = """
 <div dir="ltr" style="text-align: left;"><p>
 <h4>Dear {0}</h4><br>
 
-I am glad you signed up for the native speakers program.<br><br>
+I am glad you joined the native speakers program.<br><br>
 
 Please read the following guidelines carefully:<br>
 

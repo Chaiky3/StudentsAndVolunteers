@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 import os
-import ssl
 import json
-import smtplib
 import pathlib
 
 from datetime import datetime
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+from mailjet_rest import Client
 from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
 from typing import List, Dict, Tuple, Any, Optional, Union
@@ -75,6 +72,7 @@ class Volunteer(Human):
 @dataclass(unsafe_hash=True)
 class Manager(Human):
     apikey: str
+    apisecretkey: str
 
 
 @dataclass(unsafe_hash=True)
@@ -91,10 +89,11 @@ class Match(Writeable):
         return f"{student.first_name} {student.last_name} <--> {volunteer.first_name} {volunteer.last_name}"
 
     def send_introduction_message(self) -> None:
-        manager = Manager(managerCredentials.DEFAULT_MANAGER_FIRST_NAME,
-                          managerCredentials.DEFAULT_MANAGER_LAST_NAME,
-                          managerCredentials.DEFAULT_MANAGER_EMAIL,
-                          managerCredentials.DEFAULT_MANAGER_API_KEY)
+        manager = Manager(managerCredentials.MANAGER_FIRST_NAME,
+                          managerCredentials.MANAGER_LAST_NAME,
+                          managerCredentials.MANAGER_EMAIL,
+                          managerCredentials.MANAGER_API_KEY,
+                          managerCredentials.MANAGER_API_SECRET)
         student = DbHandler().get_student_by_id(self.student_id)
         volunteer = DbHandler().get_volunteer_by_id(self.volunteer_id)
 
@@ -130,17 +129,22 @@ class Match(Writeable):
 
         student = DbHandler().get_student_by_id(self.student_id)
         volunteer = DbHandler().get_volunteer_by_id(self.volunteer_id)
+        manager = Manager(managerCredentials.MANAGER_FIRST_NAME,
+                          managerCredentials.MANAGER_LAST_NAME,
+                          managerCredentials.MANAGER_EMAIL,
+                          managerCredentials.MANAGER_API_KEY,
+                          managerCredentials.MANAGER_API_SECRET)
 
         message_for_student = consts.REMINDER_STR.format(student.first_name, 
                                                          volunteer.first_name, 
                                                          time_passed, 
-                                                         self.manager.first_name,
-                                                         self.manager.last_name)
+                                                         manager.first_name,
+                                                         manager.last_name)
         message_for_volunteer = consts.REMINDER_STR.format(volunteer.first_name, 
                                                            student.first_name, 
                                                            time_passed, 
-                                                           self.manager.first_name,
-                                                           self.manager.last_name)
+                                                           manager.first_name,
+                                                           manager.last_name)
         
         email_to_student = Email(
             subject=subject,
@@ -154,24 +158,29 @@ class Match(Writeable):
             dst_address=volunteer.email
         )
 
-        MailBox(self.manager).send_emails([email_to_student, email_to_volunteer])
+        MailBox(manager).send_emails([email_to_student, email_to_volunteer])
 
     def send_cancelation_messages(self):
         subject = "Native Speakers Program Dematch"
 
         student = DbHandler().get_student_by_id(self.student_id)
         volunteer = DbHandler().get_volunteer_by_id(self.volunteer_id)
+        manager = Manager(managerCredentials.MANAGER_FIRST_NAME,
+                          managerCredentials.MANAGER_LAST_NAME,
+                          managerCredentials.MANAGER_EMAIL,
+                          managerCredentials.MANAGER_API_KEY,
+                          managerCredentials.MANAGER_API_SECRET)
         
         message_for_student = consts.CANCELATION_STR.format(student.first_name, 
                                                             volunteer.first_name, 
                                                             volunteer.first_name, 
-                                                            self.manager.first_name,
-                                                            self.manager.last_name)
+                                                            manager.first_name,
+                                                            manager.last_name)
         message_for_volunteer = consts.CANCELATION_STR.format(volunteer.first_name, 
                                                               student.first_name, 
                                                               student.last_name, 
-                                                              self.manager.first_name,
-                                                              self.manager.last_name)
+                                                              manager.first_name,
+                                                              manager.last_name)
 
         email_to_student = Email(
             subject=subject,
@@ -185,7 +194,7 @@ class Match(Writeable):
             dst_address=volunteer.email,
         )
 
-        MailBox(self.manager).send_emails([email_to_student, email_to_volunteer])
+        MailBox(manager).send_emails([email_to_student, email_to_volunteer])
 
 
 class DbHandler():
@@ -319,18 +328,27 @@ class Email():
 class MailBox():
     manager: Manager
     
-    def __post_init__(self):
-        self.sg = SendGridAPIClient(self.manager.apikey)
+    def __post_init__(self) -> None:
+        self.mailjet = Client(auth=(self.manager.apikey, self.manager.apisecretkey), version='v3.1')
 
     def send_emails(self, emails: List[Email]) -> None:
-        for email in emails:
-            self.sg.send(Mail(
-                from_email=self.manager.email,
-                to_emails=email.dst_address,
-                subject=email.subject,
-                html_content=email.message
-            ))
-
+        self.mailjet.send.create({
+            'Messages': [
+            {
+                    "From": {
+                            "Email": self.manager.email,
+                            "Name": f"{self.manager.first_name} {self.manager.last_name}"
+                    },
+                    "To": [
+                            {
+                                    "Email": email.dst_address
+                            }
+                    ],
+                    "Subject": email.subject,
+                    "HTMLPart": email.message
+            }
+            for email in emails]
+        })
 
 class Matcher():
     def __init__(self, manager: Manager) -> None:
