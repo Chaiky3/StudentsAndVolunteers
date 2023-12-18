@@ -1,5 +1,6 @@
 reminders.log
 db.json
 managerCredentials.py
+api.txt
 *.pyc
 __pycache__/*
