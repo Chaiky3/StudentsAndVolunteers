@@ -47,6 +47,7 @@ def send_reminders():
             updated_matches[match_id] = match
 
         elif time_passed.days > consts.DAYS_UNTIL_DELETION:
+            report_to_logger(f"Deleting all matches and students because {consts.DAYS_UNTIL_DELETION} days have passed")
             dbHandler.delete_all_matches()
             dbHandler.delete_all_students()
             exit()
