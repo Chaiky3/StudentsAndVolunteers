@@ -1,3 +1,5 @@
+import webbrowser
+
 from typing import Dict
 from consolemenu import *
 from consolemenu.items import *
@@ -217,6 +219,13 @@ def remove_matches_and_volunteers():
         dbHandler.delete_all_students()
 
 
+def open_mailjet_website():
+    url = 'https://app.mailjet.com/'
+
+    chrome_path = "C:/Program Files/Google/Chrome/Application/chrome.exe %s"
+    webbrowser.get(chrome_path).open(url)
+
+
 def run_menu():
     # Create the menu
     menu = ConsoleMenu("Students & Volunteers Matcher", "Choose an option:")
@@ -233,6 +242,7 @@ def run_menu():
     menu.append_item(FunctionItem("Delete Volunteer", delete_volunteer))
     menu.append_item(FunctionItem("Cancel Match", cancel_match))
     menu.append_item(FunctionItem("Remove Matches and Students (new year)",  remove_matches_and_volunteers))
+    menu.append_item(FunctionItem("Open MailJet Website", open_mailjet_website))
 
     menu.show()
 
