@@ -1,5 +1,6 @@
 import webbrowser
 
+from functools import partial
 from typing import Dict
 from consolemenu import *
 from consolemenu.items import *
@@ -7,14 +8,15 @@ from consolemenu.items import *
 import managerCredentials
 
 from objects import Manager, Student, Volunteer, DbHandler, Match, Matcher
-from utils import check_internet_connection, get_safe_user_input
+from utils import check_internet_connection, get_safe_user_input, press_any_key
 
 
 YES_NO_QUESTION_OPTIONS = ["y", "Y", "n", "N"]
-
-
-def press_any_key():
-    input("\nPress Enter to continue...")
+MANAGER = Manager(managerCredentials.MANAGER_FIRST_NAME,
+                      managerCredentials.MANAGER_LAST_NAME,
+                      managerCredentials.MANAGER_EMAIL,
+                      managerCredentials.MANAGER_API_KEY,
+                      managerCredentials.MANAGER_API_SECRET)
 
 
 def add_student():
@@ -51,17 +53,22 @@ def show_volunteers():
     press_any_key()
 
 
-def auto_match():
+def match(match_type: str) -> None:
+    if match_type not in ("auto", "manual"):
+        return
+    
+    if match_type == "manual":
+        match_action = Matcher(MANAGER).manual_match_and_show
+    elif match_type == "auto":
+        match_action = Matcher(MANAGER).auto_match_and_show
+
     if not check_internet_connection():
         print("This action requires internet connection, please connect to the internet and try again")
         press_any_key()
         return
-    manager = Manager(managerCredentials.MANAGER_FIRST_NAME,
-                      managerCredentials.MANAGER_LAST_NAME,
-                      managerCredentials.MANAGER_EMAIL,
-                      managerCredentials.MANAGER_API_KEY,
-                      managerCredentials.MANAGER_API_SECRET)
-    new_matches = Matcher(manager).match_and_show()
+
+    new_matches = match_action()
+
     if not new_matches:
         press_any_key()
         return
@@ -75,11 +82,6 @@ def auto_match():
         print("Sending introduction emails to new participants, this might take a while...")
         for match in new_matches:
             match.send_introduction_message()
-
-
-def manual_match():
-    print("This option is currently not supported...\n")
-    press_any_key()
 
 
 def show_matches():
@@ -233,8 +235,8 @@ def run_menu():
     # items
     menu.append_item(FunctionItem("Add a Student", add_student))
     menu.append_item(FunctionItem("Add a Volunteer", add_volunteer))
-    menu.append_item(FunctionItem("Auto Match", auto_match))
-    menu.append_item(FunctionItem("Manual Match", manual_match))
+    menu.append_item(FunctionItem("Auto Match", partial(match, "auto")))
+    menu.append_item(FunctionItem("Manual Match", partial(match, "manual")))
     menu.append_item(FunctionItem("Show Students", show_students))
     menu.append_item(FunctionItem("Show Volunteers", show_volunteers))
     menu.append_item(FunctionItem("Show Matches", show_matches))
