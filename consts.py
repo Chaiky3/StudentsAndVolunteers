@@ -2,7 +2,7 @@ DEFAULT_DB_FILE_NAME = "db.json"
 # DEFAULT_DB_FILE_NAME = "db2.json"
 DEFAULT_DB_CONTENT = {"students": {}, "volunteers": {}, "matches": {}}
 
-DAYS_BETWEEN_REMINDERS = 14
+DAYS_BETWEEN_REMINDERS = 28
 DAYS_UNTIL_DELETION = 365
 DAY_IN_SECS = 86400
 
