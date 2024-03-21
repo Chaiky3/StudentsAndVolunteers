@@ -13,7 +13,7 @@ from typing import List, Dict, Tuple, Any, Optional, Union
 import consts
 import managerCredentials
 
-from utils import is_there_match_in_list_of_matches
+from utils import get_safe_user_input, press_any_key
 
 
 @dataclass_json
@@ -87,6 +87,9 @@ class Match(Writeable):
         volunteer = DbHandler().get_volunteer_by_id(self.volunteer_id)
         
         return f"{student.first_name} {student.last_name} <--> {volunteer.first_name} {volunteer.last_name}"
+    
+    def __contains__(self, id: int) -> bool:
+        return id in (self.student_id, self.volunteer_id)
 
     def send_introduction_message(self) -> None:
         manager = Manager(managerCredentials.MANAGER_FIRST_NAME,

@@ -1,5 +1,5 @@
 reminders.log
-db.json
+db*.json
 managerCredentials.py
 api.txt
 *.pyc
