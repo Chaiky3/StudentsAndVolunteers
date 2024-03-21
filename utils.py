@@ -9,6 +9,10 @@ EXIT_CODE = 'e'
 INVALID_INPUT = "Invalid input"
 
 
+def press_any_key():
+    input("\nPress Enter to continue...")
+
+
 def check_internet_connection() -> bool:
     try:
         urllib.request.urlopen('http://google.com')
@@ -44,26 +48,3 @@ def get_safe_user_input(text: str, input_type: type = str, expected_inputs: Opti
         print(INVALID_INPUT)
         time.sleep(2)
         return None
-    
-
-def is_there_match_in_list_of_matches(student_id: int = None, volunteer_id: int = None, matches: list = None) -> bool:
-    if not student_id and not volunteer_id:
-        return False
-
-    if matches is None:
-        matches = []
-
-    for match in matches:
-        if student_id and volunteer_id:
-            if match.student_id == student_id and match.volunteer_id == volunteer_id:
-                return True
-
-        elif student_id:
-            if match.student_id == student_id:
-                return True
-        
-        else:
-            if match.volunteer_id == volunteer_id:
-                return True
-
-    return False

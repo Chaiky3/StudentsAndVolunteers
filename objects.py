@@ -13,7 +13,7 @@ from typing import List, Dict, Tuple, Any, Optional, Union
 import consts
 import managerCredentials
 
-from utils import is_there_match_in_list_of_matches
+from utils import get_safe_user_input, press_any_key
 
 
 @dataclass_json
@@ -87,6 +87,9 @@ class Match(Writeable):
         volunteer = DbHandler().get_volunteer_by_id(self.volunteer_id)
         
         return f"{student.first_name} {student.last_name} <--> {volunteer.first_name} {volunteer.last_name}"
+    
+    def __contains__(self, id: int) -> bool:
+        return id in (self.student_id, self.volunteer_id)
 
     def send_introduction_message(self) -> None:
         manager = Manager(managerCredentials.MANAGER_FIRST_NAME,
@@ -356,20 +359,40 @@ class Matcher():
         self.dbHandler: DbHandler = DbHandler()
         self.matches: List[Match] = list(self.dbHandler.db_content["matches"].values())
 
-    def match_and_show(self) -> List[Match]:
-        students = self.dbHandler.db_content["students"]
-        volunteers = self.dbHandler.db_content["volunteers"]
+    def __get_free_students(self) -> Dict[int, Student]:
+        existing_matches: Dict[int, Match] = self.dbHandler.db_content["matches"].values()
+        existing_students = self.dbHandler.db_content["students"]
+        free_students = {}
+
+        for student_id, student in existing_students.items():
+            if not any(student_id in match for match in existing_matches):
+                free_students[student_id] = student
+
+        return free_students
+    
+    def __get_free_volunteers(self) -> Dict[int, Volunteer]:
+        existing_matches: Dict[int, Match] = self.dbHandler.db_content["matches"].values()
+        existing_volunteer = self.dbHandler.db_content["volunteers"]
+        free_volunteers = {}
+
+        for volunteer_id, volunteer in existing_volunteer.items():
+            if not any(volunteer_id in match for match in existing_matches):
+                free_volunteers[volunteer_id] = volunteer
+
+        return free_volunteers
+
+    def auto_match_and_show(self) -> List[Match]:
+        students = self.__get_free_students()
+        volunteers = self.__get_free_volunteers()
         new_matches = []
+        
+        if not students or not volunteers:
+            print("No free students or volunteers in the system...")
+            return
 
         # search volunteer for each student
         for student_id in students.keys():
-            if is_there_match_in_list_of_matches(student_id=student_id, matches=self.matches):
-                # match exists for student_id
-                continue
             for volunteer_id in volunteers.keys():
-                if is_there_match_in_list_of_matches(volunteer_id=volunteer_id, matches=self.matches):
-                    # volunteer is taken
-                    continue
                 new_match = Match(student_id, volunteer_id)
                 self.matches.append(new_match)
                 new_matches.append(new_match)
@@ -389,3 +412,43 @@ class Matcher():
             print(f"\n\nAll students and volunteers coupled\n")
 
         return new_matches
+
+    def manual_match_and_show(self) -> List[Match]:
+        students = self.__get_free_students()
+        volunteers = self.__get_free_volunteers()
+        students_index_to_id_map = []
+        volunteers_index_to_id_map = []
+
+        # check that there are at least 1 student and 1 volunteer
+        if not students or not volunteers:
+            print("No free students or volunteers in the system...")
+            return
+
+        # Choose student
+        for index, (student_id, student) in enumerate(students.items()):
+            students_index_to_id_map.append(student_id)
+            print(f"{index}:    {student}")
+
+        student_index = get_safe_user_input("Choose student number to match: ", input_type=int, expected_inputs=range(len(students)))
+
+        if student_index is None:
+            return
+
+        student_id = students_index_to_id_map[int(student_index)]
+
+        # choose volunteer
+        for index, (volunteer_id, volunteer) in enumerate(volunteers.items()):
+            volunteers_index_to_id_map.append(volunteer_id)
+            print(f"{index}:    {volunteer}")
+
+        volunteer_index = get_safe_user_input(f"Choose volunteer number to match: ", input_type=int, expected_inputs=range(len(volunteers)))
+
+        if volunteer_index is None:
+            return
+        
+        volunteer_id = volunteers_index_to_id_map[int(volunteer_index)]
+
+        new_match = Match(student_id, volunteer_id)
+        print(f"\n\nMatch:\n {new_match}")
+
+        return [new_match]
