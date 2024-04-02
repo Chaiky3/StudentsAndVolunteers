@@ -4,6 +4,7 @@ import os
 import json
 import pathlib
 
+from enum import Enum, auto
 from datetime import datetime
 from mailjet_rest import Client
 from dataclasses import dataclass, field
@@ -35,35 +36,46 @@ class Human(Writeable):
 
 @dataclass(unsafe_hash=True)
 class Student(Human):
+    talksWithGirls: bool
+
     def __repr__(self) -> str:
-        return super().__repr__()
+        return super().__repr__() + f"""talks with girls: {self.talksWithGirls}
+        """
 
     @staticmethod
     def interactive() -> Student:
         params = []
-        for attr in ("First Name", "Last Name", "Email"):
+        for attr in ("First Name", "Last Name", "Email", "talks with girls [Y/n]"):
             user_input = input(f"Enter {attr}: ")
             if user_input == "e":
                 return
+            if attr == "talks with girls [Y/n]":
+                user_input = user_input != "n"
+
             params.append(user_input)
-        
+
         return Student(*params)
 
 @dataclass(unsafe_hash=True)
 class Volunteer(Human):
+    isGirl: bool
     phone: str
 
     def __repr__(self) -> str:
         return super().__repr__() + f"""phone: {self.phone}
+        is girl: {self.isGirl}
         """
 
     @staticmethod
     def interactive() -> Volunteer:
         params = []
-        for attr in ("First Name", "Last Name", "Email", "Phone Number"):
+        for attr in ("First Name", "Last Name", "Email", "Is Girl [y/N]", "Phone Number"):
             user_input = input(f"Enter {attr}: ")
             if user_input == "e":
                 return
+            if attr == "Is Girl [y/N]":
+                user_input = user_input == "y"
+
             params.append(user_input)
         
         return Volunteer(*params)
@@ -381,6 +393,16 @@ class Matcher():
 
         return free_volunteers
 
+    @staticmethod
+    def check_that_there_is_no_gender_problem(student: Student, volunteer: Volunteer) -> bool:
+        if (not volunteer.isGirl) or (student.talksWithGirls):
+            return True
+        
+        if volunteer.isGirl and student.talksWithGirls:
+            return True
+        
+        return False
+    
     def auto_match_and_show(self) -> List[Match]:
         students = self.__get_free_students()
         volunteers = self.__get_free_volunteers()
@@ -391,8 +413,10 @@ class Matcher():
             return
 
         # search volunteer for each student
-        for student_id in students.keys():
-            for volunteer_id in volunteers.keys():
+        for student_id, student in students.items():
+            for volunteer_id, volunteer in volunteers.items():
+                if not self.check_that_there_is_no_gender_problem(student, volunteer):
+                    continue
                 new_match = Match(student_id, volunteer_id)
                 self.matches.append(new_match)
                 new_matches.append(new_match)
@@ -435,6 +459,7 @@ class Matcher():
             return
 
         student_id = students_index_to_id_map[int(student_index)]
+        student = self.dbHandler.get_student_by_id(student_id)
 
         # choose volunteer
         for index, (volunteer_id, volunteer) in enumerate(volunteers.items()):
@@ -447,6 +472,11 @@ class Matcher():
             return
         
         volunteer_id = volunteers_index_to_id_map[int(volunteer_index)]
+        volunteer = self.dbHandler.get_volunteer_by_id(volunteer_id)
+
+        if not self.check_that_there_is_no_gender_problem(student, volunteer):
+            print(f"\nCan't match {student.first_name} with {volunteer.first_name} because of gender preference")
+            return
 
         new_match = Match(student_id, volunteer_id)
         print(f"\n\nMatch:\n {new_match}")
