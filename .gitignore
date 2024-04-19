@@ -3,4 +3,5 @@ db*.json
 managerCredentials.py
 api.txt
 *.pyc
+tmpMails/*
 __pycache__/*
