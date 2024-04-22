@@ -274,10 +274,10 @@ def send_mail_to_student(): write_and_send_emails([pick_studet()[0]])
 def send_mail_to_volunteer(): write_and_send_emails([pick_volunteer()[0]])
 
 
-def send_mail_to_all_students(): write_and_send_emails(DbHandler.get_students_from_db())
+def send_mail_to_all_students(): write_and_send_emails(list(DbHandler().get_students_from_db().values()))
 
 
-def send_mail_to_all_volunteers(): write_and_send_emails(DbHandler.get_volunteers_from_db())
+def send_mail_to_all_volunteers(): write_and_send_emails(list(DbHandler().get_volunteers_from_db().values()))
 
 
 def open_mailjet_website():
@@ -313,4 +313,7 @@ def run_menu():
 
 
 if __name__ == '__main__':
-    run_menu()
+    try:
+        run_menu()
+    except KeyboardInterrupt:
+        press_any_key()
