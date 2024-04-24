@@ -1,3 +1,4 @@
+import os
 import time
 import urllib.request
 import urllib.error
@@ -48,3 +49,24 @@ def get_safe_user_input(text: str, input_type: type = str, expected_inputs: Opti
         print(INVALID_INPUT)
         time.sleep(2)
         return None
+
+
+def open_file_with_notepad_and_get_content(fileName) -> str:
+    mail_content = ""
+    with open(fileName, 'w') as f:
+        pass
+
+    # open file with notepad
+    os.system(f"notepad.exe {fileName}")
+    
+    # get file content
+    with open(fileName, 'r') as f:
+        mail_content = f.read()
+
+    # delete tmp file
+    os.remove(fileName)
+
+    return mail_content
+
+def clear_screen():
+    os.system("cls")
