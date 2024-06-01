@@ -480,6 +480,8 @@ class Matcher():
     
     def auto_match_and_show(self) -> List[Match]:
         students = self.dbHandler.get_free_students()
+        # put students with constrains in the beginnning
+        sorted_students = {k: v for k, v in sorted(students.items(), key=lambda student: student[1].talksWithGirls)}
         volunteers = self.dbHandler.get_free_volunteers()
         new_matches = []
         
@@ -488,7 +490,7 @@ class Matcher():
             return
 
         # search volunteer for each student
-        for student_id, student in students.items():
+        for student_id, student in sorted_students.items():
             for volunteer_id, volunteer in volunteers.items():
                 if not self.check_that_there_is_no_gender_problem(student, volunteer):
                     continue

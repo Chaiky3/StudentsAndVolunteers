@@ -65,7 +65,7 @@ class App(customtkinter.CTk):
         self.show_main_menu()
         
         # set shit
-        self.appearance_mode_optionemenu.set("Dark")
+        self.appearance_mode_optionemenu.set("System")
         self.scaling_optionemenu.set("100%")
         self.clicked = None
 
@@ -155,7 +155,7 @@ class App(customtkinter.CTk):
         def add_action():
             obj_type = Student if type == "Student" else Volunteer
             new_obj = obj_type(*[attr.get() for attr in add_widgets])
-            
+
             # override boolean attrs
             if type == "Student":
                 new_obj.talksWithGirls = new_obj.talksWithGirls == "Talks to girls"
@@ -177,6 +177,8 @@ class App(customtkinter.CTk):
             first_name.delete(0, 'end')
             last_name.delete(0, 'end')
             email.delete(0, 'end')
+            if type == "Volunteer":
+                phone_number.delete(0, 'end')
 
         add_widgets = []
         add_label = customtkinter.CTkLabel(self.left_data_frame, text=f"Add a {type}", font=customtkinter.CTkFont(size=20, weight="bold"))
@@ -194,8 +196,9 @@ class App(customtkinter.CTk):
             add_widgets.append(talks_to_girls)
 
         elif type == "Volunteer":
-            add_widgets.append(customtkinter.CTkEntry(self.left_data_frame, placeholder_text="Phone Number", width=180))
             add_widgets.append(customtkinter.CTkSegmentedButton(self.left_data_frame, values=["Male", "Female"]))
+            phone_number = customtkinter.CTkEntry(self.left_data_frame, placeholder_text="Phone Number", width=180)
+            add_widgets.append(phone_number)
 
         for index, widget in enumerate(add_widgets):
             widget.grid(row=index + 1, column=0, padx=20, pady=(7,7))
@@ -273,19 +276,36 @@ class App(customtkinter.CTk):
                 return
 
             emails = []
+            students_addressees = []
+            volunteers_addresees = []
             db_handler = DbHandler()
-            addressee = {
-                "Student": db_handler.get_student_by_name,
-                "Volunteer": db_handler.get_volunteer_by_name,
-                "Match": db_handler.get_match_by_name
-            }.get(type)(addressee.get())
-            print(addressee)
+            if type == "Student":
+                if addressee.get().startswith("All "):
+                    students_addressees = db_handler.get_students_from_db().values()
+                else:
+                    students_addressees.append(db_handler.get_student_by_name(addressee.get()))
+            elif type == "Volunteer":
+                if addressee.get().startswith("All "):
+                    volunteers_addresees = db_handler.get_volunteers_from_db().values()
+                else:
+                    volunteers_addresees.append(db_handler.get_volunteer_by_name(addressee.get()))
+            elif type == "Match":
+                if addressee.get().startswith("All "):
+                    for match in db_handler.get_matches_from_db().values():
+                        students_addressees.append(match.get_student())
+                        volunteers_addresees.append(match.get_volunteer())
+                else:
+                    match = db_handler.get_match_by_name(addressee.get())
+                    students_addressees.append(match.get_student())
+                    volunteers_addresees.append(match.get_volunteer())
 
             if type in ("Student", "Volunteer"):
                 assert len(emails_content) == 1
                 email_content = emails_content[0].get("0.0", "end").replace("\n", "<br>")
 
-                emails.append(Email(email_subject, email_content, addressee.email))
+                email_addresses = [human.email for human in students_addressees or volunteers_addresees]
+                for address in email_addresses:
+                    emails.append(Email(email_subject, email_content, address))
 
             if type == "Match":
                 # first student and then volunteer
@@ -293,8 +313,10 @@ class App(customtkinter.CTk):
                 email_to_student_content = emails_content[0].get("0.0", "end").replace("\n", "<br>")
                 email_to_volunteer_content = emails_content[1].get("0.0", "end").replace("\n", "<br>")
 
-                emails.append(Email(email_subject, email_to_student_content, addressee.get_student().email))
-                emails.append(Email(email_subject, email_to_volunteer_content, addressee.get_volunteer().email))
+                for student_addressee in students_addressees:
+                    emails.append(Email(email_subject, email_to_student_content, student_addressee.email))
+                for volunteer_addressee in volunteers_addresees:
+                    emails.append(Email(email_subject, email_to_volunteer_content, volunteer_addressee.email))
 
             print(emails)
             # MailBox(MANAGER).send_emails(emails)
@@ -350,8 +372,13 @@ class App(customtkinter.CTk):
             if student_name == "Student" or volunteer_name == "Volunteer":
                 return
             db_handler = DbHandler()
+            student = db_handler.get_student_by_name(student_name)
             student_id = db_handler.get_student_id_by_name(student_name)
+            volunteer = db_handler.get_volunteer_by_name(volunteer_name)
             volunteer_id = db_handler.get_volunteer_id_by_name(volunteer_name)
+            if not Matcher.check_that_there_is_no_gender_problem(student, volunteer):
+                print("Gender problem")
+                return
             new_manual_match = Match(student_id, volunteer_id)
             new_matches.append(new_manual_match)
             match_result.configure(text='\n'.join(match_result.cget("text").split("\n") + [str(new_manual_match)]))
