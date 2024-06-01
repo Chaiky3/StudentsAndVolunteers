@@ -273,19 +273,36 @@ class App(customtkinter.CTk):
                 return
 
             emails = []
+            students_addressees = []
+            volunteers_addresees = []
             db_handler = DbHandler()
-            addressee = {
-                "Student": db_handler.get_student_by_name,
-                "Volunteer": db_handler.get_volunteer_by_name,
-                "Match": db_handler.get_match_by_name
-            }.get(type)(addressee.get())
-            print(addressee)
+            if type == "student":
+                if addressee.get().startswith("All "):
+                    students_addressees = db_handler.get_students_from_db().values()
+                else:
+                    students_addressees.append(db_handler.get_student_by_name(addressee.get()))
+            elif type == "Volunteer":
+                if addressee.get().startswith("All "):
+                    volunteers_addresees = db_handler.get_volunteers_from_db().values()
+                else:
+                    volunteers_addresees.append(db_handler.get_volunteer_by_name(addressee.get()))
+            elif type == "Match":
+                if addressee.get().startswith("All "):
+                    for match in db_handler.get_matches_from_db().values():
+                        students_addressees.append(match.get_student())
+                        volunteers_addresees.append(match.get_volunteer())
+                else:
+                    match = db_handler.get_match_by_name(addressee.get())
+                    students_addressees.append(match.get_student())
+                    volunteers_addresees.append(match.get_volunteer())
 
             if type in ("Student", "Volunteer"):
                 assert len(emails_content) == 1
                 email_content = emails_content[0].get("0.0", "end").replace("\n", "<br>")
 
-                emails.append(Email(email_subject, email_content, addressee.email))
+                email_addresses = [human.email for human in students_addressees or volunteers_addresees]
+                for address in email_addresses:
+                    emails.append(Email(email_subject, email_content, address.email))
 
             if type == "Match":
                 # first student and then volunteer
