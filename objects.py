@@ -28,6 +28,10 @@ class Human(Writeable):
     last_name: str
     email: str = field()
 
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name}"
+
+    
     def __repr__(self) -> str:
         return f"""
         name: {self.first_name} {self.last_name}
@@ -89,10 +93,12 @@ class Manager(Human):
 
 @dataclass(unsafe_hash=True)
 class Match(Writeable):
-    student_id: int
-    volunteer_id: int
-    date: Tuple[int, int] = datetime.now().year, datetime.now().month, datetime.now().day
+    student_id: str
+    volunteer_id: str
     num_of_reminders_sent: int = 0
+
+    def __post_init__(self):
+        self.date: List[int] = [datetime.now().year, datetime.now().month, datetime.now().day]
 
     def __repr__(self) -> str:
         student = DbHandler().get_student_by_id(self.student_id)
@@ -100,9 +106,18 @@ class Match(Writeable):
         
         return f"{student.first_name} {student.last_name} <--> {volunteer.first_name} {volunteer.last_name}"
     
+    def __str__(self) -> str:
+        return repr(self)
+
     def __contains__(self, id: int) -> bool:
         return id in (self.student_id, self.volunteer_id)
+    
+    def get_student(self) -> Student:
+        return DbHandler().get_student_by_id(self.student_id)
 
+    def get_volunteer(self) -> Volunteer:
+        return DbHandler().get_volunteer_by_id(self.volunteer_id)
+    
     def send_introduction_message(self) -> None:
         manager = Manager(managerCredentials.MANAGER_FIRST_NAME,
                           managerCredentials.MANAGER_LAST_NAME,
@@ -217,13 +232,13 @@ class DbHandler():
         self.db_content = consts.DEFAULT_DB_CONTENT
         self.db_file_path = os.path.join(pathlib.Path(__file__).parent.resolve(), db_file_name)
         
-        self.create_db(db_file_name)
+        self.create_db()
         
         self.db_content["students"]: Dict[int, Student] = self.get_students_from_db()
         self.db_content["volunteers"]: Dict[int, Volunteer] = self.get_volunteers_from_db()
         self.db_content["matches"]: Dict[int, Match] = self.get_matches_from_db()
 
-    def create_db(self, db_file_name: str):
+    def create_db(self):
         if not os.path.isfile(self.db_file_path):
             self.write_db_content_to_db()
 
@@ -233,14 +248,93 @@ class DbHandler():
 
         return {obj_id: obj_class.from_dict(obj) for obj_id, obj in db_content[obj_name].items()}
 
-    def get_students_from_db(self) -> Dict[int, Match]:
-        return self.get_objects_from_db(Student, "students")
+    def get_free_students(self) -> Dict[int, Student]:
+        existing_matches = self.db_content["matches"].values()
+        existing_students = self.db_content["students"]
+        free_students = {}
 
-    def get_volunteers_from_db(self) -> Dict[int, Match]:
-        return self.get_objects_from_db(Volunteer, "volunteers")
+        for student_id, student in existing_students.items():
+            if not any(student_id in match for match in existing_matches):
+                free_students[student_id] = student
 
-    def get_matches_from_db(self) -> Dict[int, Match]:
-        return self.get_objects_from_db(Match, "matches")
+        return free_students
+    
+    def get_free_volunteers(self) -> Dict[int, Volunteer]:
+        existing_matches = self.db_content["matches"].values()
+        existing_volunteers = self.db_content["volunteers"]
+        free_volunteers = {}
+
+        for volunteer_id, volunteer in existing_volunteers.items():
+            if not any(volunteer_id in match for match in existing_matches):
+                free_volunteers[volunteer_id] = volunteer
+
+        return free_volunteers
+
+    
+    def get_students_names(self, only_free: bool = False) -> List[str]:
+        students_pool = self.get_free_students().values() if only_free else self.db_content["students"].values()
+        return [str(student) for student in students_pool]
+
+    def get_volunteers_names(self, only_free: bool = False) -> List[str]:
+        volunteers_pool = self.get_free_volunteers().values() if only_free else self.db_content["volunteers"].values()
+        return [str(volunteer) for volunteer in volunteers_pool]
+
+    def get_matches_names(self) -> List[str]:
+        return [str(match) for match in self.db_content["matches"].values()]
+
+    def get_students_from_db(self, table_format: bool = False):
+        if not table_format:
+            return self.get_objects_from_db(Student, "students")
+        
+        return [
+            [student.first_name, student.last_name, student.email] for student in list(self.get_objects_from_db(Student, "students").values())
+        ]
+
+    def get_volunteers_from_db(self, table_format: bool = False):
+        if not table_format:
+            return self.get_objects_from_db(Volunteer, "volunteers")
+        
+        return [
+            [volunteer.first_name, volunteer.last_name, volunteer.email, volunteer.phone] for volunteer in  list(self.get_objects_from_db(Volunteer, "volunteers").values())
+        ]
+
+    def get_matches_from_db(self, table_format: bool = False):
+        if not table_format:
+            return self.get_objects_from_db(Match, "matches")
+
+        return [
+            [f"{match.get_student().first_name} {match.get_student().last_name}", f"{match.get_volunteer().first_name} {match.get_volunteer().last_name}", '/'.join([str(comp) for comp in reversed(match.date)])] for match in list(self.get_objects_from_db(Match, "matches").values())
+        ]
+
+    def get_student_id_by_name(self, full_name: str) -> int:
+        for student_id, student in self.get_students_from_db().items():
+            if str(student) == full_name:
+                return student_id
+            
+    def get_volunteer_id_by_name(self, full_name: str) -> int:
+        for volunteer_id, volunteer in self.get_volunteers_from_db().items():
+            if str(volunteer) == full_name:
+                return volunteer_id
+
+    def get_match_id_by_name(self, full_name: str) -> int:
+        for match_id, match in self.get_matches_from_db().items():
+            if str(match) == full_name:
+                return match_id
+            
+    def get_student_by_name(self, full_name: str) -> int:
+        for student in self.get_students_from_db().values():
+            if str(student) == full_name:
+                return student
+            
+    def get_volunteer_by_name(self, full_name: str) -> int:
+        for volunteer in self.get_volunteers_from_db().values():
+            if str(volunteer) == full_name:
+                return volunteer
+
+    def get_match_by_name(self, full_name: str) -> int:
+        for match in self.get_matches_from_db().values():
+            if str(match) == full_name:
+                return match
 
     def get_student_by_id(self, student_id) -> Student:
         return self.db_content["students"][student_id]
@@ -329,6 +423,10 @@ class DbHandler():
         del self.db_content["matches"][match_id]
         self.write_db_content_to_db()
 
+    def delete_all_volunteers(self) -> None:
+        self.db_content["volunteers"] = {}
+        self.write_db_content_to_db()
+
 @dataclass
 class Email():
     subject: str
@@ -369,29 +467,6 @@ class Matcher():
     def __init__(self, manager: Manager) -> None:
         self.manager = manager
         self.dbHandler: DbHandler = DbHandler()
-        self.matches: List[Match] = list(self.dbHandler.db_content["matches"].values())
-
-    def __get_free_students(self) -> Dict[int, Student]:
-        existing_matches: Dict[int, Match] = self.dbHandler.db_content["matches"].values()
-        existing_students = self.dbHandler.db_content["students"]
-        free_students = {}
-
-        for student_id, student in existing_students.items():
-            if not any(student_id in match for match in existing_matches):
-                free_students[student_id] = student
-
-        return free_students
-    
-    def __get_free_volunteers(self) -> Dict[int, Volunteer]:
-        existing_matches: Dict[int, Match] = self.dbHandler.db_content["matches"].values()
-        existing_volunteer = self.dbHandler.db_content["volunteers"]
-        free_volunteers = {}
-
-        for volunteer_id, volunteer in existing_volunteer.items():
-            if not any(volunteer_id in match for match in existing_matches):
-                free_volunteers[volunteer_id] = volunteer
-
-        return free_volunteers
 
     @staticmethod
     def check_that_there_is_no_gender_problem(student: Student, volunteer: Volunteer) -> bool:
@@ -404,8 +479,10 @@ class Matcher():
         return False
     
     def auto_match_and_show(self) -> List[Match]:
-        students = self.__get_free_students()
-        volunteers = self.__get_free_volunteers()
+        students = self.dbHandler.get_free_students()
+        # put students with constrains in the beginnning
+        sorted_students = {k: v for k, v in sorted(students.items(), key=lambda student: student[1].talksWithGirls)}
+        volunteers = self.dbHandler.get_free_volunteers()
         new_matches = []
         
         if not students or not volunteers:
@@ -413,12 +490,13 @@ class Matcher():
             return
 
         # search volunteer for each student
-        for student_id, student in students.items():
+        for student_id, student in sorted_students.items():
             for volunteer_id, volunteer in volunteers.items():
                 if not self.check_that_there_is_no_gender_problem(student, volunteer):
                     continue
+                if any(volunteer_id in match for match in new_matches):
+                    continue
                 new_match = Match(student_id, volunteer_id)
-                self.matches.append(new_match)
                 new_matches.append(new_match)
                 print(new_match)
                 break
