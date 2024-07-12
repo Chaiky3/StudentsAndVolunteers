@@ -318,8 +318,7 @@ class App(customtkinter.CTk):
                 for volunteer_addressee in volunteers_addresees:
                     emails.append(Email(email_subject, email_to_volunteer_content, volunteer_addressee.email))
 
-            print(emails)
-            # MailBox(MANAGER).send_emails(emails)
+            MailBox(MANAGER).send_emails(emails)
 
         send_email_label = customtkinter.CTkLabel(self.right_data_frame, text="Send Email To", font=customtkinter.CTkFont(size=20, weight="bold"))
         send_email_label.grid(row=0, column=1, padx=20, pady=(20, 20))
@@ -390,8 +389,8 @@ class App(customtkinter.CTk):
         def commit_matches(new_matches):
             DbHandler().add_objects_to_db(new_matches)
             print("Sending introduction emails to new participants, this might take a while...")
-            # for match in matches:
-            #     match.send_introduction_message()
+            for match in new_matches:
+                match.send_introduction_message()
 
             # refresh page
             new_matches = []
