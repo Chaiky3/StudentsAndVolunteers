@@ -1,3 +1,4 @@
+from typing import Dict
 from datetime import datetime, timedelta
 
 import consts
@@ -37,7 +38,7 @@ def send_reminders():
         report_to_logger(f"{datetime.now()}: Friday, not sending notifications")
         return
     dbHandler = DbHandler()
-    matches = dbHandler.db_content["matches"]
+    matches: Dict[int, Match] = dbHandler.get_matches_from_db()
     updated_matches = {}
     for match_id, match in matches.items():
         time_passed = time_now - datetime(*match.date)
