@@ -96,9 +96,7 @@ class Match(Writeable):
     student_id: str
     volunteer_id: str
     num_of_reminders_sent: int = 0
-
-    def __post_init__(self):
-        self.date: List[int] = [datetime.now().year, datetime.now().month, datetime.now().day]
+    date: List[int] = field(default_factory=lambda: (datetime.now().year, datetime.now().month, datetime.now().day))
 
     def __repr__(self) -> str:
         student = DbHandler().get_student_by_id(self.student_id)
