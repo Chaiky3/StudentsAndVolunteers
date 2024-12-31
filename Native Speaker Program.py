@@ -270,7 +270,7 @@ class App(customtkinter.CTk):
         ctk_remove_button.grid(row=5, column=0, padx=20, pady=10, sticky="s")
 
     def show_send_email(self, type):
-        def send_command(ctk_addressee: str, ctk_email_subject: str, ctk_emails_content: List[str]):
+        def send_command(ctk_addressee: customtkinter.CTkComboBox, ctk_email_subject: customtkinter.CTkEntry, ctk_emails_content: List[customtkinter.CTkTextbox]):
             email_subject = ctk_email_subject.get()
             if not all(chr.isalpha() or chr.isspace() for chr in email_subject):
                 return
