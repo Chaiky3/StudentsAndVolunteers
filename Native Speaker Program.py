@@ -320,6 +320,17 @@ class App(customtkinter.CTk):
 
             MailBox(MANAGER).send_emails(emails)
 
+            # update screen
+            self.show_data(type)
+            self.show_remove(type)
+            self.show_send_email(type)
+            ctk_email_subject.delete(0, 'end')
+            if type == "Match":
+                ctk_email_to_student_content.delete('1.0', 'end')
+                ctk_email_to_volunteer_content.delete('1.0', 'end')
+            else:
+                ctk_email_content.delete('1.0', 'end')
+
         ctk_send_email_label = customtkinter.CTkLabel(self.ctk_right_data_frame, text="Send Email To", font=customtkinter.CTkFont(size=20, weight="bold"))
         ctk_send_email_label.grid(row=0, column=1, padx=20, pady=(20, 20))
 
