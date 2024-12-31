@@ -35,64 +35,64 @@ class App(customtkinter.CTk):
         self.grid_rowconfigure((0,1), weight=1)
 
         # create sidebar frame and show
-        self.sidebar_frame = customtkinter.CTkFrame(self, width=140, corner_radius=0)
-        self.sidebar_frame.grid(row=0, column=0, rowspan=8, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(4, weight=1)
+        self.ctk_sidebar_frame = customtkinter.CTkFrame(self, width=140, corner_radius=0)
+        self.ctk_sidebar_frame.grid(row=0, column=0, rowspan=8, sticky="nsew")
+        self.ctk_sidebar_frame.grid_rowconfigure(4, weight=1)
 
         # create scrollable frame
-        self.scrollable_frame = customtkinter.CTkScrollableFrame(self)
-        self.scrollable_frame.grid(row=0, column=1, sticky="nsew")
+        self.ctk_scrollable_frame = customtkinter.CTkScrollableFrame(self)
+        self.ctk_scrollable_frame.grid(row=0, column=1, sticky="nsew")
 
         # create data frame
-        self.data_frame = customtkinter.CTkFrame(self, bg_color="transparent")
-        self.data_frame.grid(row=1, column=1, columnspan=3, sticky="nsew")
-        self.data_frame.grid_columnconfigure((0,1,2), weight=1)
+        self.ctk_data_frame = customtkinter.CTkFrame(self, bg_color="transparent")
+        self.ctk_data_frame.grid(row=1, column=1, columnspan=3, sticky="nsew")
+        self.ctk_data_frame.grid_columnconfigure((0,1,2), weight=1)
 
         # create left subdata frame
-        self.left_data_frame = customtkinter.CTkFrame(self.data_frame, fg_color="transparent")
-        self.left_data_frame.grid(row=0, column=0, rowspan=5, sticky="nsew")
-        self.left_data_frame.grid_rowconfigure(3, weight=1)
+        self.ctk_left_data_frame = customtkinter.CTkFrame(self.ctk_data_frame, fg_color="transparent")
+        self.ctk_left_data_frame.grid(row=0, column=0, rowspan=5, sticky="nsew")
+        self.ctk_left_data_frame.grid_rowconfigure(3, weight=1)
 
         # create middle subdata frame
-        self.middle_data_frame = customtkinter.CTkFrame(self.data_frame, fg_color="transparent")
-        self.middle_data_frame.grid(row=0, column=1, rowspan=5, sticky="nsew")
+        self.ctk_middle_data_frame = customtkinter.CTkFrame(self.ctk_data_frame, fg_color="transparent")
+        self.ctk_middle_data_frame.grid(row=0, column=1, rowspan=5, sticky="nsew")
 
         # create right subdata frame
-        self.right_data_frame = customtkinter.CTkFrame(self.data_frame, fg_color="transparent")
-        self.right_data_frame.grid(row=0, column=2, rowspan=5, sticky="nsew")
-        self.right_data_frame.grid_rowconfigure(2, weight=1)
+        self.ctk_right_data_frame = customtkinter.CTkFrame(self.ctk_data_frame, fg_color="transparent")
+        self.ctk_right_data_frame.grid(row=0, column=2, rowspan=5, sticky="nsew")
+        self.ctk_right_data_frame.grid_rowconfigure(2, weight=1)
 
         self.show_main_menu()
         
         # set shit
-        self.appearance_mode_optionemenu.set("System")
-        self.scaling_optionemenu.set("100%")
+        self.ctk_appearance_mode_optionemenu.set("System")
+        self.ctk_scaling_optionemenu.set("100%")
         self.clicked = None
 
     def show_main_menu(self):
-        self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Native speakers Program", font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
+        self.ctk_logo_label = customtkinter.CTkLabel(self.ctk_sidebar_frame, text="Native speakers Program", font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.ctk_logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
 
         self.destroy_data_widgets()
-        self.student_button = customtkinter.CTkButton(self.sidebar_frame, command=partial(self.show_dashboard, "Student"), text="Students")
-        self.student_button.grid(row=1, column=0, padx=20, pady=10, sticky="ew")
-        self.volunteers_button = customtkinter.CTkButton(self.sidebar_frame, command=partial(self.show_dashboard, "Volunteer"), text="Volunteers")
-        self.volunteers_button.grid(row=2, column=0, padx=20, pady=10, sticky="ew")
-        self.matches_button = customtkinter.CTkButton(self.sidebar_frame, command=partial(self.show_dashboard, "Match"), text="Matches")
-        self.matches_button.grid(row=3, column=0, padx=20, pady=10, sticky="ew")
-        self.mailjet_button = customtkinter.CTkButton(self.sidebar_frame, command=self.open_mailjet_website, text="Open MailJet")
-        self.mailjet_button.grid(row=4, column=0, padx=20, pady=10, sticky="ew")
+        self.ctk_student_button = customtkinter.CTkButton(self.ctk_sidebar_frame, command=partial(self.show_dashboard, "Student"), text="Students")
+        self.ctk_student_button.grid(row=1, column=0, padx=20, pady=10, sticky="ew")
+        self.ctk_volunteers_button = customtkinter.CTkButton(self.ctk_sidebar_frame, command=partial(self.show_dashboard, "Volunteer"), text="Volunteers")
+        self.ctk_volunteers_button.grid(row=2, column=0, padx=20, pady=10, sticky="ew")
+        self.ctk_matches_button = customtkinter.CTkButton(self.ctk_sidebar_frame, command=partial(self.show_dashboard, "Match"), text="Matches")
+        self.ctk_matches_button.grid(row=3, column=0, padx=20, pady=10, sticky="ew")
+        self.ctk_mailjet_button = customtkinter.CTkButton(self.ctk_sidebar_frame, command=self.open_mailjet_website, text="Open MailJet")
+        self.ctk_mailjet_button.grid(row=4, column=0, padx=20, pady=10, sticky="ew")
 
-        self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance Mode:", anchor="w")
-        self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
-        self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"],
+        self.ctk_appearance_mode_label = customtkinter.CTkLabel(self.ctk_sidebar_frame, text="Appearance Mode:", anchor="w")
+        self.ctk_appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
+        self.ctk_appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.ctk_sidebar_frame, values=["Light", "Dark", "System"],
                                                                        command=self.change_appearance_mode_event)
-        self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(10, 10))
-        self.scaling_label = customtkinter.CTkLabel(self.sidebar_frame, text="UI Scaling:", anchor="w")
-        self.scaling_label.grid(row=7, column=0, padx=20, pady=(10, 0))
-        self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["80%", "90%", "100%", "110%", "120%"],
+        self.ctk_appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(10, 10))
+        self.ctk_scaling_label = customtkinter.CTkLabel(self.ctk_sidebar_frame, text="UI Scaling:", anchor="w")
+        self.ctk_scaling_label.grid(row=7, column=0, padx=20, pady=(10, 0))
+        self.ctk_scaling_optionemenu = customtkinter.CTkOptionMenu(self.ctk_sidebar_frame, values=["80%", "90%", "100%", "110%", "120%"],
                                                                command=self.change_scaling_event)
-        self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
+        self.ctk_scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
 
     # def popup_window(self, message):
     #     popup_window = customtkinter.CTkToplevel(self)
@@ -107,17 +107,17 @@ class App(customtkinter.CTk):
     
     def show_dashboard(self, type: str):
         if type == "Student": 
-            self.student_button.configure(state="disabled")
-            self.volunteers_button.configure(state="normal")
-            self.matches_button.configure(state="normal")
+            self.ctk_student_button.configure(state="disabled")
+            self.ctk_volunteers_button.configure(state="normal")
+            self.ctk_matches_button.configure(state="normal")
         if type == "Volunteer": 
-            self.student_button.configure(state="normal")
-            self.volunteers_button.configure(state="disabled"),
-            self.matches_button.configure(state="normal")
+            self.ctk_student_button.configure(state="normal")
+            self.ctk_volunteers_button.configure(state="disabled"),
+            self.ctk_matches_button.configure(state="normal")
         if type == "Match": 
-            self.student_button.configure(state="normal")
-            self.volunteers_button.configure(state="normal"),
-            self.matches_button.configure(state="disabled")
+            self.ctk_student_button.configure(state="normal")
+            self.ctk_volunteers_button.configure(state="normal"),
+            self.ctk_matches_button.configure(state="disabled")
 
         self.destroy_data_widgets()
         self.show_data(type)
@@ -126,13 +126,13 @@ class App(customtkinter.CTk):
         self.show_send_email(type)
 
     def destroy_data_widgets(self):
-        for frame in (self.scrollable_frame, self.left_data_frame, self.middle_data_frame, self.right_data_frame):
+        for frame in (self.ctk_scrollable_frame, self.ctk_left_data_frame, self.ctk_middle_data_frame, self.ctk_right_data_frame):
             for widget in frame.winfo_children():
                 widget.grid_forget()
 
     def show_data(self, type):
         try:
-            self.table.destroy()
+            self.ctk_table.destroy()
         except:
             pass
         db_handler = DbHandler()
@@ -142,8 +142,8 @@ class App(customtkinter.CTk):
             "Match": db_handler.get_matches_from_db(table_format=True)
         }.get(type)
         columns = len(db[0]) if len(db) else 4
-        self.table = CTkTable(self.scrollable_frame, row=len(db), column=columns, values=db, hover=True, width=760/columns)
-        self.table.grid(row=0, column=1, padx=(10, 10), pady=(20, 0))
+        self.ctk_table = CTkTable(self.ctk_scrollable_frame, row=len(db), column=columns, values=db, hover=True, width=760/columns)
+        self.ctk_table.grid(row=0, column=1, padx=(10, 10), pady=(20, 0))
 
     def show_add_or_match(self, type):
         if type == "Match":
@@ -174,41 +174,41 @@ class App(customtkinter.CTk):
             self.show_data(type)
             self.show_remove(type)
             self.show_send_email(type)
-            first_name.delete(0, 'end')
-            last_name.delete(0, 'end')
-            email.delete(0, 'end')
+            ctk_first_name.delete(0, 'end')
+            ctk_last_name.delete(0, 'end')
+            ctk_email.delete(0, 'end')
             if type == "Volunteer":
-                phone_number.delete(0, 'end')
+                ctk_phone_number.delete(0, 'end')
 
         add_widgets = []
-        add_label = customtkinter.CTkLabel(self.left_data_frame, text=f"Add a {type}", font=customtkinter.CTkFont(size=20, weight="bold"))
-        add_label.grid(row=0, column=0, padx=20, pady=(20, 20))
+        ctk_add_label = customtkinter.CTkLabel(self.ctk_left_data_frame, text=f"Add a {type}", font=customtkinter.CTkFont(size=20, weight="bold"))
+        ctk_add_label.grid(row=0, column=0, padx=20, pady=(20, 20))
 
-        first_name = customtkinter.CTkEntry(self.left_data_frame, placeholder_text="First Name", width=180)
-        add_widgets.append(first_name)
-        last_name = customtkinter.CTkEntry(self.left_data_frame, placeholder_text="Last Name", width=180)
-        add_widgets.append(last_name)
-        email = customtkinter.CTkEntry(self.left_data_frame, placeholder_text="Email", width=180)
-        add_widgets.append(email)
+        ctk_first_name = customtkinter.CTkEntry(self.ctk_left_data_frame, placeholder_text="First Name", width=180)
+        add_widgets.append(ctk_first_name)
+        ctk_last_name = customtkinter.CTkEntry(self.ctk_left_data_frame, placeholder_text="Last Name", width=180)
+        add_widgets.append(ctk_last_name)
+        ctk_email = customtkinter.CTkEntry(self.ctk_left_data_frame, placeholder_text="Email", width=180)
+        add_widgets.append(ctk_email)
         if type == "Student":
-            talks_to_girls = customtkinter.CTkSegmentedButton(self.left_data_frame, values=["Talks to girls", "Doesn't talk to girls"], width=180)
-            talks_to_girls.set("Talks to girls")
-            add_widgets.append(talks_to_girls)
+            ctk_talks_to_girls = customtkinter.CTkSegmentedButton(self.ctk_left_data_frame, values=["Talks to girls", "Doesn't talk to girls"], width=180)
+            ctk_talks_to_girls.set("Talks to girls")
+            add_widgets.append(ctk_talks_to_girls)
 
         elif type == "Volunteer":
-            add_widgets.append(customtkinter.CTkSegmentedButton(self.left_data_frame, values=["Male", "Female"]))
-            phone_number = customtkinter.CTkEntry(self.left_data_frame, placeholder_text="Phone Number", width=180)
-            add_widgets.append(phone_number)
+            add_widgets.append(customtkinter.CTkSegmentedButton(self.ctk_left_data_frame, values=["Male", "Female"]))
+            ctk_phone_number = customtkinter.CTkEntry(self.ctk_left_data_frame, placeholder_text="Phone Number", width=180)
+            add_widgets.append(ctk_phone_number)
 
         for index, widget in enumerate(add_widgets):
             widget.grid(row=index + 1, column=0, padx=20, pady=(7,7))
         
-        submit_button = customtkinter.CTkButton(self.left_data_frame, text="Submit", command=add_action)
-        submit_button.grid(row=len(add_widgets)+1, column=0, padx=20, pady=(30,10))
+        ctk_submit_button = customtkinter.CTkButton(self.ctk_left_data_frame, text="Submit", command=add_action)
+        ctk_submit_button.grid(row=len(add_widgets)+1, column=0, padx=20, pady=(30,10))
 
     def show_remove(self, type):
         def remove_action():
-            name = name_to_delete.get()
+            name = ctk_name_to_delete.get()
             
             if not name:
                 return
@@ -247,7 +247,7 @@ class App(customtkinter.CTk):
                 delete_function(id_to_delete)
 
             # refresh page
-            name_to_delete.configure(values=get_available_names_to_delete())
+            ctk_name_to_delete.configure(values=get_available_names_to_delete())
             self.show_data(type)
             self.show_add_or_match(type)
             self.show_send_email(type)
@@ -260,18 +260,18 @@ class App(customtkinter.CTk):
             }[type]
 
         db_handler = DbHandler()
-        remove_label = customtkinter.CTkLabel(self.middle_data_frame, text=f"Remove a {type}", font=customtkinter.CTkFont(size=20, weight="bold"))
-        remove_label.grid(row=0, column=0, padx=20, pady=(20, 20))
+        ctk_remove_label = customtkinter.CTkLabel(self.ctk_middle_data_frame, text=f"Remove a {type}", font=customtkinter.CTkFont(size=20, weight="bold"))
+        ctk_remove_label.grid(row=0, column=0, padx=20, pady=(20, 20))
 
-        name_to_delete = customtkinter.CTkComboBox(self.middle_data_frame, values=get_available_names_to_delete(), width=220)
-        name_to_delete.grid(row=1, column=0, padx=20, pady=(7,7))
+        ctk_name_to_delete = customtkinter.CTkComboBox(self.ctk_middle_data_frame, values=get_available_names_to_delete(), width=220)
+        ctk_name_to_delete.grid(row=1, column=0, padx=20, pady=(7,7))
 
-        remove_button = customtkinter.CTkButton(self.middle_data_frame, command=remove_action, text="Remove")
-        remove_button.grid(row=5, column=0, padx=20, pady=10, sticky="s")
+        ctk_remove_button = customtkinter.CTkButton(self.ctk_middle_data_frame, command=remove_action, text="Remove")
+        ctk_remove_button.grid(row=5, column=0, padx=20, pady=10, sticky="s")
 
     def show_send_email(self, type):
-        def send_command(addressee: str, email_subject: str, emails_content: List[str]):
-            email_subject = email_subject.get()
+        def send_command(ctk_addressee: str, ctk_email_subject: str, ctk_emails_content: List[str]):
+            email_subject = ctk_email_subject.get()
             if not all(chr.isalpha() or chr.isspace() for chr in email_subject):
                 return
 
@@ -280,28 +280,28 @@ class App(customtkinter.CTk):
             volunteers_addresees = []
             db_handler = DbHandler()
             if type == "Student":
-                if addressee.get().startswith("All "):
+                if ctk_addressee.get().startswith("All "):
                     students_addressees = db_handler.get_students_from_db().values()
                 else:
-                    students_addressees.append(db_handler.get_student_by_name(addressee.get()))
+                    students_addressees.append(db_handler.get_student_by_name(ctk_addressee.get()))
             elif type == "Volunteer":
-                if addressee.get().startswith("All "):
+                if ctk_addressee.get().startswith("All "):
                     volunteers_addresees = db_handler.get_volunteers_from_db().values()
                 else:
-                    volunteers_addresees.append(db_handler.get_volunteer_by_name(addressee.get()))
+                    volunteers_addresees.append(db_handler.get_volunteer_by_name(ctk_addressee.get()))
             elif type == "Match":
-                if addressee.get().startswith("All "):
+                if ctk_addressee.get().startswith("All "):
                     for match in db_handler.get_matches_from_db().values():
                         students_addressees.append(match.get_student())
                         volunteers_addresees.append(match.get_volunteer())
                 else:
-                    match = db_handler.get_match_by_name(addressee.get())
+                    match = db_handler.get_match_by_name(ctk_addressee.get())
                     students_addressees.append(match.get_student())
                     volunteers_addresees.append(match.get_volunteer())
 
             if type in ("Student", "Volunteer"):
-                assert len(emails_content) == 1
-                email_content = emails_content[0].get("0.0", "end").replace("\n", "<br>")
+                assert len(ctk_emails_content) == 1
+                email_content = ctk_emails_content[0].get("0.0", "end").replace("\n", "<br>")
 
                 email_addresses = [human.email for human in students_addressees or volunteers_addresees]
                 for address in email_addresses:
@@ -309,9 +309,9 @@ class App(customtkinter.CTk):
 
             if type == "Match":
                 # first student and then volunteer
-                assert len(emails_content) == 2
-                email_to_student_content = emails_content[0].get("0.0", "end").replace("\n", "<br>")
-                email_to_volunteer_content = emails_content[1].get("0.0", "end").replace("\n", "<br>")
+                assert len(ctk_emails_content) == 2
+                email_to_student_content = ctk_emails_content[0].get("0.0", "end").replace("\n", "<br>")
+                email_to_volunteer_content = ctk_emails_content[1].get("0.0", "end").replace("\n", "<br>")
 
                 for student_addressee in students_addressees:
                     emails.append(Email(email_subject, email_to_student_content, student_addressee.email))
@@ -320,8 +320,8 @@ class App(customtkinter.CTk):
 
             MailBox(MANAGER).send_emails(emails)
 
-        send_email_label = customtkinter.CTkLabel(self.right_data_frame, text="Send Email To", font=customtkinter.CTkFont(size=20, weight="bold"))
-        send_email_label.grid(row=0, column=1, padx=20, pady=(20, 20))
+        ctk_send_email_label = customtkinter.CTkLabel(self.ctk_right_data_frame, text="Send Email To", font=customtkinter.CTkFont(size=20, weight="bold"))
+        ctk_send_email_label.grid(row=0, column=1, padx=20, pady=(20, 20))
 
         db_handler = DbHandler()
         options_to_send_to = {
@@ -329,45 +329,45 @@ class App(customtkinter.CTk):
             "Volunteer": ["All Volunteers"] + db_handler.get_volunteers_names(),
             "Match": ["All Matches"] + db_handler.get_matches_names()
         }.get(type)
-        name_to_send_email_to = customtkinter.CTkComboBox(self.right_data_frame, values=options_to_send_to, width=220)
-        name_to_send_email_to.grid(row=1, column=1, padx=20, pady=(7,7))
+        ctk_name_to_send_email_to = customtkinter.CTkComboBox(self.ctk_right_data_frame, values=options_to_send_to, width=220)
+        ctk_name_to_send_email_to.grid(row=1, column=1, padx=20, pady=(7,7))
 
-        email_subject = customtkinter.CTkEntry(self.right_data_frame, placeholder_text="Email Subject", width=180)
-        email_subject.grid(row=2, column=1, padx=20, pady=(7,7))
+        ctk_email_subject = customtkinter.CTkEntry(self.ctk_right_data_frame, placeholder_text="Email Subject", width=180)
+        ctk_email_subject.grid(row=2, column=1, padx=20, pady=(7,7))
 
         emails_content = []
         if type == "Match":
-            email_to_student_content = customtkinter.CTkTextbox(self.right_data_frame, width=180, height=65)
-            email_to_student_content.insert("end", "Dear student...")
-            email_to_student_content.grid(row=3, column=1, padx=20, pady=(7,7))
-            emails_content.append(email_to_student_content)
+            ctk_email_to_student_content = customtkinter.CTkTextbox(self.ctk_right_data_frame, width=180, height=65)
+            ctk_email_to_student_content.insert("end", "Dear student...")
+            ctk_email_to_student_content.grid(row=3, column=1, padx=20, pady=(7,7))
+            emails_content.append(ctk_email_to_student_content)
             
-            email_to_volunteer_content = customtkinter.CTkTextbox(self.right_data_frame, width=180, height=65)
-            email_to_volunteer_content.insert("end", "Dear volunteer...")
-            email_to_volunteer_content.grid(row=4, column=1, padx=20, pady=(7,7))
-            emails_content.append(email_to_volunteer_content)
+            ctk_email_to_volunteer_content = customtkinter.CTkTextbox(self.ctk_right_data_frame, width=180, height=65)
+            ctk_email_to_volunteer_content.insert("end", "Dear volunteer...")
+            ctk_email_to_volunteer_content.grid(row=4, column=1, padx=20, pady=(7,7))
+            emails_content.append(ctk_email_to_volunteer_content)
         else:
-            email_content = customtkinter.CTkTextbox(self.right_data_frame, width=180, height=120)
-            email_content.grid(row=3, column=1, padx=20, pady=(7,7))
-            emails_content.append(email_content)
+            ctk_email_content = customtkinter.CTkTextbox(self.ctk_right_data_frame, width=180, height=120)
+            ctk_email_content.grid(row=3, column=1, padx=20, pady=(7,7))
+            emails_content.append(ctk_email_content)
 
-        send_button = customtkinter.CTkButton(self.right_data_frame, command=lambda: send_command(name_to_send_email_to, email_subject, emails_content), text="Send")
-        send_button.grid(row=5, column=1, padx=20, pady=(30,10), sticky="s")
+        ctk_send_button = customtkinter.CTkButton(self.ctk_right_data_frame, command=lambda: send_command(ctk_name_to_send_email_to, ctk_email_subject, emails_content), text="Send")
+        ctk_send_button.grid(row=5, column=1, padx=20, pady=(30,10), sticky="s")
 
     def show_match(self, method="auto"):
-        for widget in self.left_data_frame.winfo_children():
+        for widget in self.ctk_left_data_frame.winfo_children():
             widget.destroy()
 
         def suggest_auto_match():
             for new_match in Matcher(MANAGER).auto_match_and_show():
                 new_matches.append(new_match)
-            match_result.configure(text='\n'.join([str(match) for match in new_matches]))
+            ctk_match_result.configure(text='\n'.join([str(match) for match in new_matches]))
 
         def add_manual_match():
-            if len(match_result.cget("text").split("\n")) > 5:
+            if len(ctk_match_result.cget("text").split("\n")) > 5:
                 return
-            student_name = combobox_student.get()
-            volunteer_name = combobox_volunteer.get()
+            student_name = ctk_combobox_student.get()
+            volunteer_name = ctk_combobox_volunteer.get()
             if student_name == "Student" or volunteer_name == "Volunteer":
                 return
             db_handler = DbHandler()
@@ -380,11 +380,11 @@ class App(customtkinter.CTk):
                 return
             new_manual_match = Match(student_id, volunteer_id)
             new_matches.append(new_manual_match)
-            match_result.configure(text='\n'.join(match_result.cget("text").split("\n") + [str(new_manual_match)]))
+            ctk_match_result.configure(text='\n'.join(ctk_match_result.cget("text").split("\n") + [str(new_manual_match)]))
 
             # reset comboboxes
-            combobox_student.set("Student")
-            combobox_volunteer.set("Volunteer")
+            ctk_combobox_student.set("Student")
+            ctk_combobox_volunteer.set("Volunteer")
 
         def commit_matches(new_matches):
             DbHandler().add_objects_to_db(new_matches)
@@ -394,43 +394,43 @@ class App(customtkinter.CTk):
 
             # refresh page
             new_matches = []
-            match_result.configure(text="")
+            ctk_match_result.configure(text="")
             self.show_data(type="Match")
             self.show_remove(type="Match")
             self.show_send_email(type="Match")
 
         new_matches = []
 
-        auto_match_label = customtkinter.CTkLabel(self.left_data_frame, text="Match", font=customtkinter.CTkFont(size=20, weight="bold"))
-        auto_match_label.grid(row=0, column=0, padx=20, pady=(20, 20))
+        ctk_auto_match_label = customtkinter.CTkLabel(self.ctk_left_data_frame, text="Match", font=customtkinter.CTkFont(size=20, weight="bold"))
+        ctk_auto_match_label.grid(row=0, column=0, padx=20, pady=(20, 20))
 
-        match_method_picker = customtkinter.CTkSegmentedButton(self.left_data_frame, values=["auto", "manual"], command=self.show_match)
-        match_method_picker.set(method)
-        match_method_picker.grid(row=1, column=0, padx=20, pady=(7,7), sticky="nsew")
+        ctk_match_method_picker = customtkinter.CTkSegmentedButton(self.ctk_left_data_frame, values=["auto", "manual"], command=self.show_match)
+        ctk_match_method_picker.set(method)
+        ctk_match_method_picker.grid(row=1, column=0, padx=20, pady=(7,7), sticky="nsew")
 
-        match_result = customtkinter.CTkLabel(self.left_data_frame, text="", height=100, width=180, bg_color="white")
-        match_result.grid(row=2, column=0, padx=20, pady=(7,7))
+        ctk_match_result = customtkinter.CTkLabel(self.ctk_left_data_frame, text="", height=100, width=180, bg_color="white")
+        ctk_match_result.grid(row=2, column=0, padx=20, pady=(7,7))
 
-        if match_method_picker.get() == "auto":
-            auto_match_button = customtkinter.CTkButton(self.left_data_frame, command=suggest_auto_match, text="Suggest auto match")
-            auto_match_button.grid(row=3, column=0, padx=20, pady=10, sticky="s")
+        if ctk_match_method_picker.get() == "auto":
+            ctk_auto_match_button = customtkinter.CTkButton(self.ctk_left_data_frame, command=suggest_auto_match, text="Suggest auto match")
+            ctk_auto_match_button.grid(row=3, column=0, padx=20, pady=10, sticky="s")
 
-        elif match_method_picker.get() == "manual":
-            manual_match_picking_frame = customtkinter.CTkFrame(self.left_data_frame)
-            manual_match_picking_frame.grid(row=3, column=0)
+        elif ctk_match_method_picker.get() == "manual":
+            ctk_manual_match_picking_frame = customtkinter.CTkFrame(self.ctk_left_data_frame)
+            ctk_manual_match_picking_frame.grid(row=3, column=0)
             
             db_handler = DbHandler()
-            combobox_student = customtkinter.CTkComboBox(manual_match_picking_frame, values=["Student"] + db_handler.get_students_names(only_free=True), width=100)
-            combobox_student.grid(row=0, column=0, padx=(0, 2))
+            ctk_combobox_student = customtkinter.CTkComboBox(ctk_manual_match_picking_frame, values=["Student"] + db_handler.get_students_names(only_free=True), width=100)
+            ctk_combobox_student.grid(row=0, column=0, padx=(0, 2))
 
-            combobox_volunteer = customtkinter.CTkComboBox(manual_match_picking_frame, values=["Volunteer"] + db_handler.get_volunteers_names(only_free=True), width=100)
-            combobox_volunteer.grid(row=0, column=1, padx=(2, 0))
+            ctk_combobox_volunteer = customtkinter.CTkComboBox(ctk_manual_match_picking_frame, values=["Volunteer"] + db_handler.get_volunteers_names(only_free=True), width=100)
+            ctk_combobox_volunteer.grid(row=0, column=1, padx=(2, 0))
 
-            add_button = customtkinter.CTkButton(self.left_data_frame, command=add_manual_match, text="Add nominal match")
-            add_button.grid(row=4, column=0, padx=20, pady=10, sticky="s")
+            ctk_add_button = customtkinter.CTkButton(self.ctk_left_data_frame, command=add_manual_match, text="Add nominal match")
+            ctk_add_button.grid(row=4, column=0, padx=20, pady=10, sticky="s")
 
-        submit_button = customtkinter.CTkButton(self.left_data_frame, command=lambda: commit_matches(new_matches), text="Approve")
-        submit_button.grid(row=5, column=0, padx=20, pady=10, sticky="s")
+        ctk_submit_button = customtkinter.CTkButton(self.ctk_left_data_frame, command=lambda: commit_matches(new_matches), text="Approve")
+        ctk_submit_button.grid(row=5, column=0, padx=20, pady=10, sticky="s")
 
     def change_appearance_mode_event(self, new_appearance_mode: str):
         customtkinter.set_appearance_mode(new_appearance_mode)
